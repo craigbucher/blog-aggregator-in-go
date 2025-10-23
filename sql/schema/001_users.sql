@@ -1,0 +1,10 @@
+-- +goose Up
+CREATE TABLE users (
+    id UUID primary key,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    name VARCHAR(255) UNIQUE NOT NULL
+);
+
+-- +goose Down
+DROP TABLE users;
