@@ -55,6 +55,22 @@ func main() {
 	cmds.register("register", handlerRegister)
 	// Add a new command called reset that calls the query:
 	cmds.register("reset", handlerReset)
+	// Add a new command called users that calls GetUsers and prints all the users to the console:
+	cmds.register("users", handlerListUsers)
+	// Add an agg command:
+	cmds.register("agg", handlerAgg)
+	// Add a new command called addfeed:
+	cmds.register("addfeed", handlerAddFeed)
+	// Add a new feeds handler. It takes no arguments and prints all the feeds in the database 
+	// to the console:
+	cmds.register("feeds", handlerListFeeds)
+	/* Add a follow command. It takes a single url argument and creates a new feed follow record 
+	for the current user. It should print the name of the feed and the current user once the record 
+	is created (which the query we just made should support). You'll need a query to look up feeds 
+	by URL */
+	cmds.register("follow", handlerFollow)
+	// Add a following command. It should print all the names of the feeds the current user is following:
+	cmds.register("following", handlerListFeedFollows)
 	/* If there are fewer than 2 arguments, print an error message to the terminal and exit. 
 	Why two? The first argument is automatically the program name, which we ignore, and we 
 	require a command name */

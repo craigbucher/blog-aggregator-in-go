@@ -13,3 +13,10 @@ SELECT * FROM users WHERE name = $1;
 
 -- name: DeleteUsers :exec
 DELETE FROM users;
+
+-- name: GetUsers :many
+SELECT * FROM users;
+
+-- name: GetUserById :one
+-- The name of the user that created the feed (you might need a new SQL query)
+SELECT * FROM users WHERE id = $1;
