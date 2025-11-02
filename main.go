@@ -3,6 +3,7 @@ package main
 import (
 	// "fmt"
 	// "log"
+	"context"
 	"log"
 	"os"
 	"database/sql"
@@ -60,7 +61,7 @@ func main() {
 	// Add an agg command:
 	cmds.register("agg", handlerAgg)
 	// Add a new command called addfeed:
-	cmds.register("addfeed", handlerAddFeed)
+	cmds.register("addfeed", middlewareLoggedIn(handlerAddFeed))
 	// Add a new feeds handler. It takes no arguments and prints all the feeds in the database 
 	// to the console:
 	cmds.register("feeds", handlerListFeeds)
@@ -68,9 +69,14 @@ func main() {
 	for the current user. It should print the name of the feed and the current user once the record 
 	is created (which the query we just made should support). You'll need a query to look up feeds 
 	by URL */
-	cmds.register("follow", handlerFollow)
+	cmds.register("follow", middlewareLoggedIn(handlerFollow))
 	// Add a following command. It should print all the names of the feeds the current user is following:
-	cmds.register("following", handlerListFeedFollows)
+	cmds.register("following", middlewareLoggedIn(handlerListFeedFollows))
+	// Add a new unfollow command that accepts a feed's URL as an argument and unfollows it for 
+	// the current user. This is, of course, a "logged in" command - use the new middleware:
+	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
+	// Add the browse command. It should take an optional "limit" parameter
+	cmds.register("browse", middlewareLoggedIn(handlerBrowse))
 	/* If there are fewer than 2 arguments, print an error message to the terminal and exit. 
 	Why two? The first argument is automatically the program name, which we ignore, and we 
 	require a command name */
@@ -86,5 +92,21 @@ func main() {
 	err = cmds.run(programState, command{Name: cmdName, Args: cmdArgs})
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+/* Create logged-in middleware. It will allow us to change the function signature of our handlers 
+that require a logged in user to accept a user as an argument and DRY up our code. Here's the 
+function signature of my middleware: 
+You'll notice it's a higher order function that takes a handler of the "logged in" type and returns a "normal" handler 
+that we can register.*/
+func middlewareLoggedIn(handler func(s *state, cmd command, user database.User) error) func(*state, command) error {
+	return func(s *state, cmd command) error {
+		user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+		if err != nil {
+			return err
+		}
+
+		return handler(s, cmd, user)
 	}
 }

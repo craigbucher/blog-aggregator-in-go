@@ -45,7 +45,7 @@ func handlerLogin(s *state, cmd command) error {
 	// If the command's arg's slice is empty, return an error; the login handler expects 
 	// a single argument, the username:
 	if len(cmd.Args) != 1 {
-		return fmt.Errorf("usage: %s <name>", cmd.Name)
+		return fmt.Errorf("usage: %v <name>", cmd.Name)
 	}
 	name := cmd.Args[0]
 	// Update the login command handler to error (and exit with code 1) if the given 
